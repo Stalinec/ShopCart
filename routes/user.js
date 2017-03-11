@@ -3,11 +3,25 @@ var router = express.Router();
 var csrf = require('csurf');
 var passport = require('passport');
 
+var Order = require('../models/order');
+var Cart = require('../models/cart');
+
 var csrProtection = csrf();
 router.use(csrProtection);
 
 router.get('/profile', isLoggedIn, function(req, res, next){
-  res.render('user/profile');
+  // here user is always authenticated because of function isLoggedIn
+  Order.find({user: req.user}, function(err, orders){ // passport put user to req after authentication
+    if(err){
+      return res.write('Error!');
+    }
+    var cart;
+    orders.forEach(function(order){
+      cart = new Cart(order.cart);
+      order.items = cart.generateArray();
+    });
+    res.render('user/profile', { orders: orders });
+  });
 });
 
 router.get('/logout', isLoggedIn, function(req, res, next){
@@ -25,10 +39,17 @@ router.get('/signup', function(req, res, next){
 });
 
 router.post('/signup', passport.authenticate('local.signup', {
-  successRedirect: '/user/profile',
+  //successRedirect: '/user/profile',
   failureRedirect: '/user/signup',
   failureFlash: true
-}));
+}), function(req, res, next){ // this fuction will be called if passport.authenticate() above will be successful
+  let url = '/user/profile';
+  if(req.session.oldUrl){
+    url = req.session.oldUrl;
+    req.session.oldUrl = null;
+  }
+  res.redirect(url);
+});
 
 router.get('/signin', function(req, res, next){
   var messages = req.flash('error');
@@ -36,10 +57,17 @@ router.get('/signin', function(req, res, next){
 });
 
 router.post('/signin', passport.authenticate('local.signin', {
-  successRedirect: '/user/profile',
+  //successRedirect: '/user/profile',
   failureRedirect: '/user/signin',
   failureFlash: true
-}));
+}), function(req, res, next){ // this fuction will be called if passport.authenticate() above will be successful
+  let url = '/user/profile';
+  if(req.session.oldUrl){
+    url = req.session.oldUrl;
+    req.session.oldUrl = null;
+  }
+  res.redirect(url);
+});
 
 module.exports = router;
 
