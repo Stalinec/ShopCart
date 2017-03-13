@@ -17,7 +17,9 @@ var userRoutes = require('./routes/user');
 
 var app = express();
 
-mongoose.connect('localhost:27017/shopping');
+//mongoose.connect('localhost:27017/shopping');
+mongoose.connect('mongodb://shop:shop@ds129610.mlab.com:29610/games-shop');
+
 require('./config/passport'); // this allows passport in index.js see configuration from config/passport
 
 // view engine setup

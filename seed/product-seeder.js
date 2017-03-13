@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 var Product = require('../models/product');
 
-mongoose.connect('localhost:27017/shopping');
+//mongoose.connect('localhost:27017/shopping');
+mongoose.connect('mongodb://shop:shop@ds129610.mlab.com:29610/games-shop');
 
 var products = [
   new Product({
@@ -54,15 +55,17 @@ var products = [
   })
 ];
 
-var done = 0;
-for(var i = 0; i < products.length; i++){
-  products[i].save(() => {
-    done++;
-    if(done === products.length){
-      exit();
-    }
-  });
-}
+Product.remove({}).then(function(){
+  var done = 0;
+  for(var i = 0; i < products.length; i++){
+    products[i].save(() => {
+      done++;
+      if(done === products.length){
+        exit();
+      }
+    });
+  }
+});
 
 function exit(){
   mongoose.disconnect();
