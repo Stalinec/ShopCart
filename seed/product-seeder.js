@@ -1,8 +1,10 @@
+require('dotenv').config({path: '../.env'});
 var mongoose = require('mongoose');
 var Product = require('../models/product');
+var DBConfig = require('../config/db');
+var env = process.env.ENV;
 
-//mongoose.connect('localhost:27017/shopping');
-mongoose.connect('mongodb://shop:shop@ds129610.mlab.com:29610/games-shop');
+mongoose.connect(DBConfig[env].mongourl);
 
 var products = [
   new Product({
@@ -55,7 +57,7 @@ var products = [
   })
 ];
 
-Product.remove({}).then(function(){
+Product.remove({}).then(function(){ // first remove all old documents
   var done = 0;
   for(var i = 0; i < products.length; i++){
     products[i].save(() => {

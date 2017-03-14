@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+require('dotenv').load();
 var expressHbs = require('express-handlebars');
 var mongoose = require('mongoose');
 var session = require('express-session');
@@ -17,8 +18,8 @@ var userRoutes = require('./routes/user');
 
 var app = express();
 
-//mongoose.connect('localhost:27017/shopping');
-mongoose.connect('mongodb://shop:shop@ds129610.mlab.com:29610/games-shop');
+var DBConfig = require('./config/db');
+mongoose.connect(DBConfig[process.env.ENV].mongourl);
 
 require('./config/passport'); // this allows passport in index.js see configuration from config/passport
 
